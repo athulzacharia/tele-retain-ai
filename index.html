@@ -147,7 +147,7 @@
                 appendMessage("User", userQuery);
                 chatInput.value = "";
 
-                fetch("http://127.0.0.1:5000/chat", {
+                fetch("https://teleretain-backend.onrender.com/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ query: userQuery })
