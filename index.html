@@ -140,12 +140,41 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
+            // Step 3: Add typing indicator functions
+            function showTypingIndicator() {
+                const typingDiv = document.createElement("div");
+                typingDiv.id = "typing-indicator";
+                typingDiv.classList.add("p-2", "rounded-lg", "bg-gray-100", "my-2", "flex", "space-x-1");
+                typingDiv.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function removeTypingIndicator() {
+                const typingIndicator = document.getElementById("typing-indicator");
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            // Step 6: Add welcome message
+            setTimeout(() => {
+                appendMessage("AI", "Hello! I'm TeleRetain AI assistant. How can I help you with your telecom service today?");
+            }, 500);
+
             sendButton.addEventListener("click", function () {
                 const userQuery = chatInput.value.trim();
                 if (userQuery === "") return;
 
                 appendMessage("User", userQuery);
                 chatInput.value = "";
+
+                // Show typing indicator
+                showTypingIndicator();
 
                 fetch("https://teleretain-backend.onrender.com/chat", {
                     method: "POST",
@@ -154,12 +183,24 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    // Remove typing indicator
+                    removeTypingIndicator();
                     appendMessage("AI", data.response);
                 })
                 .catch(error => {
+                    // Step 5: Improved error handling
+                    removeTypingIndicator();
                     console.error("Error:", error);
-                    appendMessage("AI", "Sorry, an error occurred.");
+                    appendMessage("AI", "Sorry, I'm having trouble connecting to the server. This might be because the server is starting up (can take up to 30 seconds on the first request) or there's a temporary issue. Please try again in a moment.");
                 });
+            });
+
+            // Step 4: Add Enter key press handling
+            chatInput.addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    sendButton.click();
+                }
             });
         });
     </script>
